@@ -28,7 +28,7 @@ local function lua_search_pattern(search)
     return pattern
 end
 
-local function vim_search_pattern(search)
+function vim_search_pattern(search)
     if #search == 1 then
         return search
     end
@@ -49,7 +49,7 @@ local function vim_search_pattern(search)
     return pattern .. search:sub(-1)
 end
 
-function ctrlp_lua_match(lines, search, limit)
+function ctrlp_lua_match()
     local items = vim.eval('a:items')
     local search = vim.eval('a:str'):lower()
     local match_mode = vim.eval('a:mmode')
@@ -85,8 +85,10 @@ function ctrlp_lua_match(lines, search, limit)
             result:add(item)
         end
     end
+end
 
-    return vim_search_pattern(search)
+function ctrlp_lua_regex()
+    return vim_search_pattern(vim.eval('a:str'):lower())
 end
 EOF
 
@@ -97,15 +99,9 @@ func! ctrlp#luamatcher#Match(items, str, limit, mmode, ispath, crfile, regex)
         return a:items[0:a:limit]
     endif
 
-    let matchregex = '\v\c'
-    if a:mmode == 'filename-only'
-        let matchregex .= '[\^\/]*'
-    endif
+    call matchadd('CtrlPMatch', '\v\c' . (a:mmode == 'filename-only' ? '[\^\/]*' : '') . luaeval('ctrlp_lua_regex()'))
 
     let result = []
-    let matchregex .= luaeval('ctrlp_lua_match()')
-
-    call matchadd('CtrlPMatch', matchregex)
-
+    lua ctrlp_lua_match()
     return result
 endf
