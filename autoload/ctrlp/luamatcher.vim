@@ -19,11 +19,11 @@ local function lua_search_pattern(search)
     for i = 1, #search do
         local c = search:sub(i, i)
         if c == '\\' or c == '/' then
-            c = '[\\/]'
+            pattern = pattern .. '[\\/][^\\/]*'
         else
             c = lua_escapes[c] or c
+            pattern = pattern .. c .. '[^' .. c .. ']*'
         end
-        pattern = pattern .. c .. '[^' .. c .. ']*'
     end
     return pattern
 end
@@ -40,11 +40,11 @@ local function vim_search_pattern(search)
     for i = 1, #search - 1 do
         local c = search:sub(i, i)
         if c == '\\' or c == '/' then
-            c = '[\\\\\\/]'
+            pattern = pattern .. '[\\\\\\/][^\\\\\\/]*'
         else
             c = vim_escapes[c] or c
+            pattern = pattern .. c .. '[^' .. c .. ']*'
         end
-        pattern = pattern .. c .. '[^' .. c .. ']*'
     end
     return pattern .. search:sub(-1)
 end
