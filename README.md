@@ -1,11 +1,11 @@
 ## Overview
 
-Matcher function for [https://github.com/kien/ctrlp.vim](ctrlp) implemented in lua.
+Matcher function for [ctrlp](https://github.com/kien/ctrlp.vim) implemented in lua.
 
 Other implementation:
 
-	* [https://github.com/FelikZ/ctrlp-py-matcher/](ctrlp-py-matcher) in python
-	* [https://github.com/JazzCore/ctrlp-cmatcher/](ctrlp-cmatcher) in C
+* [ctrlp-py-matcher](https://github.com/FelikZ/ctrlp-py-matcher/) in python
+* [ctrlp-cmatcher](https://github.com/JazzCore/ctrlp-cmatcher/) in C
 
 ## Usage
 
