@@ -12,3 +12,9 @@ Other implementation:
 ```
 let g:ctrlp_match_func = { 'match': 'ctrlp#luamatcher#Match' }
 ```
+
+## Implementation
+
+The fuzzy match is implemented as pattern: ```abc``` -> ```a[^a]*b[^b]*c[^c]*```
+
+The results are then sorted by length.
