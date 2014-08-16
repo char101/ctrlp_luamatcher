@@ -11,7 +11,7 @@ for c in string.gmatch('^$.()[]{}+\\/', '.') do
 	vim_escapes[c] = '\\' .. c
 end
 
-function lua_search_pattern(search)
+local function lua_search_pattern(search)
 	if #search == 1 then
 		return search
 	end
@@ -28,7 +28,7 @@ function lua_search_pattern(search)
 	return pattern
 end
 
-function vim_search_pattern(search)
+local function vim_search_pattern(search)
 	if #search == 1 then
 		return search
 	end
@@ -107,8 +107,6 @@ function ctrlp_lua_match()
 			result:add(item[1])
 		end
 	end
-
-	result:add(lua_search_pattern(search))
 end
 
 function ctrlp_lua_regex()
