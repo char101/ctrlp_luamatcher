@@ -70,17 +70,26 @@ local function find_shortest(string, search)
 	return found_len
 end
 
-function ctrlp_lua_match()
-	local items = vim.eval('a:items')
-	local search = vim.eval('a:str'):lower()
-	local match_mode = vim.eval('a:mmode')
-	local ispath = vim.eval('a:ispath') == 1
-	local currentfile = vim.eval('a:crfile')
+local is_neovim = vim['api'] ~= nil and vim.api['nvim_eval'] ~= nil
+
+if is_neovim then
+	function to_vim_list(obj)
+		return obj
+	end
+else
+	function to_vim_list(obj)
+		return vim.list(obj)
+	end
+end
+
+function ctrlp_lua_match(items, str, limit, match_mode, ispathnum, currentfile)
+	local search = str:lower()
+	local ispath = ispathnum == 1
 	local filename_only = match_mode == 'filename-only'
 
 	local temp_result = {}
 	local pattern = lua_search_pattern(search)
-	for item in items() do
+	for idx, item in ipairs(items) do
 		if not ispath or item ~= currentfile then
 			if filename_only then
 				item = item.gsub(item, '[^\\/]*[\\/]', '')
@@ -100,17 +109,18 @@ function ctrlp_lua_match()
 
 	table.sort(temp_result, function(a, b) return a[2] < b[2] or (a[2] == b[2] and #a[1] < #b[1]) end)
 
-	local limit = vim.eval('a:limit')
-	local result = vim.eval('result')
+	local result = {}
 	for i, item in ipairs(temp_result) do
 		if i <= limit then
-			result:add(item[1])
+			table.insert(result, item[1])
 		end
 	end
+
+	return to_vim_list(result)
 end
 
-function ctrlp_lua_regex()
-	return vim_search_pattern(vim.eval('a:str'):lower())
+function ctrlp_lua_regex(str)
+	return vim_search_pattern(str:lower())
 end
 EOF
 
@@ -121,9 +131,8 @@ func! ctrlp#luamatcher#Match(items, str, limit, mmode, ispath, crfile, regex)
 		return a:items[0:a:limit]
 	endif
 
-	call matchadd('CtrlPMatch', '\v\c' . (a:mmode == 'filename-only' ? '[\^\\\/]*' : '') . luaeval('ctrlp_lua_regex()'))
+	call matchadd('CtrlPMatch', '\v\c' . (a:mmode == 'filename-only' ? '[\^\\\/]*' : '') . luaeval('ctrlp_lua_regex(_A.str)', { 'str': a:str }))
 
-	let result = []
-	lua ctrlp_lua_match()
+	let result = luaeval('ctrlp_lua_match(_A.items, _A.str, _A.limit, _A.mmode, _A.ispath, _A.crfile)', { 'items': a:items, 'str': a:str, 'limit': a:limit, 'mmode': a:mmode, 'ispath': a:ispath, 'crfile': a:crfile })
 	return result
 endf
